@@ -1,0 +1,21 @@
+{
+  "risk": [
+    "APO12"
+  ],
+  "security": [
+    "APO13",
+    "DSS05"
+  ],
+  "availability": [
+    "DSS01"
+  ],
+  "change": [
+    "BAI06"
+  ],
+  "continuity": [
+    "DSS04"
+  ],
+  "capacity": [
+    "BAI04"
+  ]
+}

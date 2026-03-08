@@ -1,0 +1,23 @@
+{
+  "access control": [
+    "A.5"
+  ],
+  "encryption": [
+    "A.8"
+  ],
+  "backup": [
+    "A.12"
+  ],
+  "logging": [
+    "A.8.16"
+  ],
+  "supplier": [
+    "A.5.19"
+  ],
+  "business continuity": [
+    "A.5.30"
+  ],
+  "secure development": [
+    "A.8.28"
+  ]
+}

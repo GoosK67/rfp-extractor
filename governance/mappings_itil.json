@@ -1,0 +1,20 @@
+{
+  "incident": [
+    "Incident Management"
+  ],
+  "problem": [
+    "Problem Management"
+  ],
+  "change": [
+    "Change Enablement"
+  ],
+  "service level": [
+    "Service Level Management"
+  ],
+  "availability": [
+    "Availability Management"
+  ],
+  "capacity": [
+    "Capacity and Performance Management"
+  ]
+}
