@@ -1,0 +1,6 @@
+
+python-docx
+pandas
+openpyxl
+# AI is opt-in; uncomment if you enable --ai on and implement real calls
+# openai>=1.12.0
