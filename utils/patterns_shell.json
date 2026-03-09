@@ -1,0 +1,14 @@
+{
+  "patterns": [
+    "^external service provider .* shall be:?$",
+    "^the (supplier|provider) shall:?$",
+    "^the tenderer shall:?$",
+    "^requirements?:$",
+    "^scope:?$",
+    "^out of scope:?$",
+    "^to be (defined|determined)[:.]?$",
+    "^n/?a$",
+    "^tbd$",
+    "^shall be:?$"
+  ]
+}

@@ -22,3 +22,8 @@ Thumbs.db
 *.log
 out.xlsx
 examples/*.xlsx
+
+
+# Whitelist JSON die we wél willen tracken
+!governance/*.json
+!utils/patterns_shell.json
