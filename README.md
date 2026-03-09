@@ -22,6 +22,7 @@ python -m pip install -r requirements.txt
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\.venv\Scripts\Activate.ps1
+$env:GOV_EXPLAIN="1"
 python rfp_extract.py examples/ --xlsx out.xlsx --ai on --chat-model "qwen2.5:3b-instruct"
 ```
 
