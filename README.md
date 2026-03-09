@@ -269,6 +269,7 @@ Requirement:
 
 ```bash
 python rfp_extract.py "input.docx" --xlsx out.xlsx --ai on
+python rfp_extract.py "examples/*.docx" "examples/*.xlsx" --xlsx out.xlsx --ai on
 ```
 
 > **Performance tip**: eerste run van een model kan traag zijn (download + warmup).  
