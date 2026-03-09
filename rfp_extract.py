@@ -1,20 +1,22 @@
-
-# rfp_extract.py — multi-file orchestrator with semantic classifier, semantic governance and document role detection
-# Python 3.13 compatible, no heavy ML deps; uses local Ollama for embeddings + LLM explanations
-
+# rfp_extract.py — multi-file extractor (DOCX + XLSX)
+# - Strikte requirement-poort + legal/adres-filter
+# - Hybride score (rule + semantic)
+# - Governance gating (cues + min similarity)
+# - Uitleg fail-safe (chat timeout / fallback)
 from __future__ import annotations
-import argparse
-import sys
+
+import argparse, sys, glob
 from pathlib import Path
-import glob
 import pandas as pd
 import docx
 
 from utils.helpers import (
     normalize_ws,
     rule_requirement_score,
-    detect_document_role,
+    is_probably_requirement_text,
+    looks_like_legal_or_address,
     classify_requirement,
+    detect_document_role,
 )
 from ai.semantic_classifier import SemanticRequirementClassifier
 from ai.semantic_governance import SemanticGovernanceMapper
@@ -24,12 +26,10 @@ OUTPUT_COLS = [
     "cobit", "itil", "iso27001",
     "governance_explanation", "governance_confidence"
 ]
-
 ALLOWED_EXTS = {".docx", ".xlsx"}
 
-
-def collect_input_files(inputs:list[str]) -> list[Path]:
-    files: list[Path] = []
+def collect_input_files(inputs: list[str]) -> list[Path]:
+    files : list[Path] = []
     for arg in inputs:
         p = Path(arg)
         if p.is_dir():
@@ -42,15 +42,12 @@ def collect_input_files(inputs:list[str]) -> list[Path]:
                 mp = Path(m)
                 if mp.suffix.lower() in ALLOWED_EXTS and mp.exists():
                     files.append(mp)
-    # unique preserve order
-    uniq: list[Path] = []
-    seen = set()
+    uniq, seen = [], set()
     for f in files:
         if f not in seen:
             uniq.append(f)
             seen.add(f)
     return uniq
-
 
 def parse_docx_file(path: Path, clf: SemanticRequirementClassifier, mapper: SemanticGovernanceMapper):
     out = []
@@ -60,7 +57,7 @@ def parse_docx_file(path: Path, clf: SemanticRequirementClassifier, mapper: Sema
         print(f"[WARN] Cannot open DOCX: {path} ({e})", file=sys.stderr)
         return out
 
-    # read first 800 chars for role detection
+    # Document role
     header_text = []
     for p in document.paragraphs[:15]:
         t = normalize_ws(p.text)
@@ -68,7 +65,7 @@ def parse_docx_file(path: Path, clf: SemanticRequirementClassifier, mapper: Sema
             header_text.append(t)
     role = detect_document_role("\n".join(header_text), path.name)
 
-    # PRICING/LEGAL → skip requirement extraction
+    # PRICING/LEGAL → skip
     if role in {"PRICING", "LEGAL"}:
         print(f"[INFO] Skipping requirement extraction for {path.name} (role={role})")
         return out
@@ -77,15 +74,27 @@ def parse_docx_file(path: Path, clf: SemanticRequirementClassifier, mapper: Sema
         txt = normalize_ws(p.text)
         if not txt:
             continue
-        # rule score
-        rule_s = rule_requirement_score(txt)
-        # semantic score
-        sem_s = clf.score(txt)
-        final = 0.5 * rule_s + 0.5 * sem_s
-        if final < 0.55:  # threshold can be tuned
+        # absolute legal/adres skip
+        if looks_like_legal_or_address(txt):
+            continue
+        # strikte poort
+        if not is_probably_requirement_text(txt):
             continue
 
+        # hybride score
+        rule_s = rule_requirement_score(txt)
+        sem_s  = clf.score(txt)
+        final  = 0.5 * rule_s + 0.5 * sem_s
+
+        # strengere drempel voor BR uit RFP_MAIN
         rtype = classify_requirement(txt, role_hint=role)
+        if role == "RFP_MAIN" and rtype == "BR":
+            if final < 0.65:
+                continue
+        else:
+            if final < 0.55:
+                continue
+
         gov = mapper.map_text(txt)
         out.append({
             "id": mapper.hash_id(txt),
@@ -101,34 +110,28 @@ def parse_docx_file(path: Path, clf: SemanticRequirementClassifier, mapper: Sema
         })
     return out
 
-
 def _pick_text_column(columns):
     cand = {c.lower().strip(): c for c in columns}
-    priority = [
-        "requirement", "requirements", "req", "requirement_text",
-        "description", "omschrijving", "beschrijving", "text"
-    ]
+    priority = ["requirement", "requirements", "req", "requirement_text",
+                "description", "omschrijving", "beschrijving", "text"]
     for key in priority:
-        for k,v in cand.items():
+        for k, v in cand.items():
             if key == k:
                 return v
-    # contains
-    for k,v in cand.items():
+    for k, v in cand.items():
         if any(x in k for x in ["require", "desc", "text", "eis"]):
             return v
     return columns[0] if columns else None
 
-
 def parse_xlsx_file(path: Path, clf: SemanticRequirementClassifier, mapper: SemanticGovernanceMapper):
     out = []
-    import openpyxl  # ensure engine
+    import openpyxl  # engine
     try:
         xls = pd.ExcelFile(str(path), engine="openpyxl")
     except Exception as e:
         print(f"[WARN] Cannot open XLSX: {path} ({e})", file=sys.stderr)
         return out
 
-    # role detection from first sheet text
     role = "GENERIC"
     try:
         df0 = pd.read_excel(xls, sheet_name=xls.sheet_names[0], engine="openpyxl", nrows=100)
@@ -152,17 +155,28 @@ def parse_xlsx_file(path: Path, clf: SemanticRequirementClassifier, mapper: Sema
         text_col = _pick_text_column(list(df.columns))
         if not text_col:
             continue
+
         for _, row in df.iterrows():
-            val = row.get(text_col, "")
-            txt = normalize_ws(str(val))
+            txt = normalize_ws(str(row.get(text_col, "")))
             if not txt:
                 continue
-            rule_s = rule_requirement_score(txt)
-            sem_s = clf.score(txt)
-            final = 0.5 * rule_s + 0.5 * sem_s
-            if final < 0.55:
+            if looks_like_legal_or_address(txt):
                 continue
+            if not is_probably_requirement_text(txt):
+                continue
+
+            rule_s = rule_requirement_score(txt)
+            sem_s  = clf.score(txt)
+            final  = 0.5 * rule_s + 0.5 * sem_s
+
             rtype = classify_requirement(txt, role_hint=role)
+            if role == "RFP_MAIN" and rtype == "BR":
+                if final < 0.65:
+                    continue
+            else:
+                if final < 0.55:
+                    continue
+
             gov = mapper.map_text(txt)
             out.append({
                 "id": mapper.hash_id(txt),
@@ -178,10 +192,8 @@ def parse_xlsx_file(path: Path, clf: SemanticRequirementClassifier, mapper: Sema
             })
     return out
 
-
 def dedupe(records: list[dict]) -> list[dict]:
-    seen = set()
-    out = []
+    seen, out = set(), []
     for r in records:
         key = normalize_ws(r["text"]).lower()
         if key in seen:
@@ -190,10 +202,8 @@ def dedupe(records: list[dict]) -> list[dict]:
         out.append(r)
     return out
 
-
 def export_xlsx(records: list[dict], out_path: Path):
     df = pd.DataFrame(records)
-    # ensure columns
     for c in OUTPUT_COLS:
         if c not in df.columns:
             df[c] = ""
@@ -213,15 +223,13 @@ def export_xlsx(records: list[dict], out_path: Path):
         for name, sub in tabs.items():
             sub.to_excel(writer, sheet_name=name, index=False)
 
-
-
 def main():
-    parser = argparse.ArgumentParser(description="RFP multi-file extractor with semantic classifier and governance (Ollama)")
+    parser = argparse.ArgumentParser(description="RFP multi-file extractor (hybrid filter + governance gating)")
     parser.add_argument("inputs", nargs="+", help="Files/patterns or a directory (e.g., examples/ or 'examples/*.docx' 'examples/*.xlsx')")
     parser.add_argument("--xlsx", default="out.xlsx")
-    parser.add_argument("--ai", default="on", choices=["on","off"])
-    parser.add_argument("--embed-model", default=None, help="Override embedding model (Ollama)")
-    parser.add_argument("--chat-model", default=None, help="Override chat model (Ollama)")
+    parser.add_argument("--ai", default="on", choices=["on", "off"])
+    parser.add_argument("--embed-model", default=None)
+    parser.add_argument("--chat-model",  default=None)
     args = parser.parse_args()
 
     files = collect_input_files(args.inputs)
@@ -233,10 +241,10 @@ def main():
     for f in files:
         print(f"  - {f}")
 
-    clf = SemanticRequirementClassifier(embed_model=args.embed_model)
+    clf    = SemanticRequirementClassifier(embed_model=args.embed_model)
     mapper = SemanticGovernanceMapper(embed_model=args.embed_model, chat_model=args.chat_model)
 
-    all_recs = []
+    all_recs : list[dict] = []
     for f in files:
         if f.suffix.lower() == ".docx":
             all_recs += parse_docx_file(f, clf, mapper)
@@ -246,7 +254,6 @@ def main():
     merged = dedupe(all_recs)
     export_xlsx(merged, Path(args.xlsx))
     print(f"[OK] Wrote {args.xlsx} (records={len(merged)})")
-
 
 if __name__ == "__main__":
     main()

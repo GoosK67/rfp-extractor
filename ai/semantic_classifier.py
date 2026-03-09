@@ -1,14 +1,12 @@
-
 from __future__ import annotations
-import os, json, math
 import numpy as np
 from .ollama_client import OllamaClient
 
 POSITIVE_PROTOS = [
     "The supplier shall provide first-line support and ensure incidents are resolved within agreed SLAs.",
-    "De leverancier moet eindgebruikers ondersteunen en storingen binnen SLA oplossen.",
+    "De leverancier moet eindgebruikers ondersteunen en storingen binnen de SLA oplossen.",
     "Le prestataire doit assurer la gestion des incidents et fournir une assistance aux utilisateurs.",
-    "The system must implement access control and monitoring.",
+    "The system must implement access control, security logging and monitoring.",
 ]
 NEGATIVE_PROTOS = [
     "The HR department",
@@ -18,17 +16,16 @@ NEGATIVE_PROTOS = [
 ]
 
 class SemanticRequirementClassifier:
-    def __init__(self, embed_model: str|None=None):
+    def __init__(self, embed_model: str | None = None):
         self.cli = OllamaClient(embed_model=embed_model)
-        # precompute centroids
         self.pos_centroid = self._centroid(POSITIVE_PROTOS)
         self.neg_centroid = self._centroid(NEGATIVE_PROTOS)
 
-    def _embed(self, text:str) -> np.ndarray:
-        vec = self.cli.embed(text)
-        return np.array(vec, dtype=float)
+    def _embed(self, text: str) -> np.ndarray:
+        v = self.cli.embed(text)
+        return np.array(v, dtype=float)
 
-    def _centroid(self, texts:list[str]) -> np.ndarray:
+    def _centroid(self, texts: list[str]) -> np.ndarray:
         vecs = [self._embed(t) for t in texts]
         if not vecs:
             return np.zeros(1)
@@ -48,6 +45,5 @@ class SemanticRequirementClassifier:
         v = self._embed(text)
         s_pos = self._cos(v, self.pos_centroid)
         s_neg = self._cos(v, self.neg_centroid)
-        # map to 0..1
         raw = (s_pos - s_neg + 1.0) / 2.0
         return max(0.0, min(1.0, raw))
