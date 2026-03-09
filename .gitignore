@@ -17,12 +17,13 @@ Thumbs.db
 .DS_Store
 
 # Outputs
-*.xlsx
+# In plaats van alles:
+# *.xlsx
+# Specifieke outputlocaties
+/out.xlsx
+/output/*.xlsx
 *.json
 *.log
-out.xlsx
-examples/*.xlsx
-
 
 # Whitelist JSON die we wél willen tracken
 !governance/*.json
