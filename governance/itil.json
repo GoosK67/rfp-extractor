@@ -1,0 +1,17 @@
+[
+  {
+    "id": "Incident Management",
+    "title": "Incident Management",
+    "description": "Reduce the negative impact of incidents by restoring service as quickly as possible."
+  },
+  {
+    "id": "Change Enablement",
+    "title": "Change Enablement",
+    "description": "Maximize the number of successful product and service changes by ensuring risks are properly assessed."
+  },
+  {
+    "id": "Service Level Management",
+    "title": "Service Level Management",
+    "description": "Set clear business\u2011based targets for service performance."
+  }
+]

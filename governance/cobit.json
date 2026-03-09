@@ -1,0 +1,22 @@
+[
+  {
+    "id": "APO09",
+    "title": "Service Level Management",
+    "description": "Define, agree, monitor and report on IT\u2011enabled business services."
+  },
+  {
+    "id": "APO13",
+    "title": "Security",
+    "description": "Manage security to protect enterprise information."
+  },
+  {
+    "id": "DSS01",
+    "title": "Operations",
+    "description": "Coordinate and execute day\u2011to\u2011day activities and procedures to deliver services."
+  },
+  {
+    "id": "DSS02",
+    "title": "Incident Management",
+    "description": "Provide timely resolution of incidents and restore normal service operation."
+  }
+]

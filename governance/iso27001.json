@@ -1,0 +1,17 @@
+[
+  {
+    "id": "A.12",
+    "title": "Operations Security",
+    "description": "Ensure correct and secure operations of information processing facilities."
+  },
+  {
+    "id": "A.17",
+    "title": "Business Continuity",
+    "description": "Information security continuity should be embedded in the organization\u2019s business continuity management systems."
+  },
+  {
+    "id": "A.9",
+    "title": "Access Control",
+    "description": "Limit access to information and information processing facilities."
+  }
+]
