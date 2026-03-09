@@ -268,8 +268,8 @@ Requirement:
 **Stap 4 — Draai met AI ingeschakeld:**
 
 ```bash
-python rfp_extract.py "input.docx" --xlsx out.xlsx --ai on
-python rfp_extract.py "examples/*.docx" "examples/*.xlsx" --xlsx out.xlsx --ai on
+python rfp_extract.py "input.docx" --xlsx out.xlsx --ai on                          #voor 1 document
+python rfp_extract.py "examples/*.docx" "examples/*.xlsx" --xlsx out.xlsx --ai on   #voor een folder en multiple docs
 ```
 
 > **Performance tip**: eerste run van een model kan traag zijn (download + warmup).  
