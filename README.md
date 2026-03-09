@@ -11,6 +11,7 @@ This package adds **semantic requirement classification**, **semantic governance
 
 ## Setup
 ```powershell
+
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1  # or .\.venv\Scripts\activate.bat
 python -m pip install --upgrade pip
@@ -19,6 +20,8 @@ python -m pip install -r requirements.txt
 
 ## Run extractor (multi-file)
 ```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
 python rfp_extract.py examples/ --xlsx out.xlsx --ai on
 ```
 
