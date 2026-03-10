@@ -1,7 +1,7 @@
 import requests, re, yaml, sys
 BOOKSTACK_URL = "https://wiki.cegeka.com/api"
-TOKEN_ID = "REPLACE"
-TOKEN_SECRET = "REPLACE"
+TOKEN_ID = "sCFoRe5YsD8VxJa8WT90i2fWGSZxV4Ml"
+TOKEN_SECRET = "d6H2eumWx1561V9ju33EeXMH6nAS9TwT"
 def bks_headers(): return {"Authorization": f"Token {TOKEN_ID}:{TOKEN_SECRET}"}
 def get_pages():
  r=requests.get(f"{BOOKSTACK_URL}/pages?count=5000",headers=bks_headers()); r.raise_for_status(); return r.json()["data"]
