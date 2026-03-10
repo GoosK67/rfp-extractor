@@ -1,0 +1,8 @@
+{
+  "@context": {
+    "id": "@id",
+    "type": "@type",
+    "name": "http://schema.org/name",
+    "Requirement": "https://vocab.ceg/Requirement"
+  }
+}

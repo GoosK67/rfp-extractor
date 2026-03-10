@@ -1,0 +1,60 @@
+# ontology_tags.yaml
+version: 1.0.0
+namespace: "ceg"
+classes:
+  BusinessLine: {}
+  ProductFamily:
+    parent: BusinessLine
+  Product:
+    parent: ProductFamily
+  Document:
+    properties: ["documentType", "status", "modified", "modifiedBy"]
+  Process:
+    properties: ["processCode", "name"]
+  Requirement: {}
+  BusinessRequirement:
+    parent: Requirement
+  FunctionalRequirement:
+    parent: Requirement
+  NonFunctionalRequirement:
+    parent: Requirement
+  HChapter: {}
+  Policy: {}
+  Artifact: {}
+  Role: {}
+  COBITProcess: {}
+  ITILPractice: {}
+  ISOControl: {}
+relations:
+  contains: {}
+  has: {}
+  supports: {}
+  derivedFrom: {}
+  mappedTo: {}
+  governedBy: {}
+  satisfies: {}
+  dependsOn: {}
+  verifiedBy: {}
+  mitigates: {}
+  implements: {}
+namespaces:
+  ceg: "https://vocab.ceg/"
+  bks: "bookstack:/"
+  gov: "https://vocab.ceg/governance/"
+tag_patterns:
+  requirement_id: "^id:req:(BR-\d{3}|FR-\d{3}|NFR-\d{3})$"
+  class_tag: "^ceg:(BusinessLine|ProductFamily|Product|Document|Process|Requirement|BusinessRequirement|FunctionalRequirement|NonFunctionalRequirement|HChapter|Policy|Artifact|Role|COBITProcess|ITILPractice|ISOControl):[A-Za-z0-9._-]+$"
+  gov_chapter: "^gov:chapter:H(10|[1-9])$"
+  gov_process: "^gov:process:[A-Z0-9_-]+$"
+  gov_policy: "^gov:policy:[A-Z0-9_.-]+$"
+  gov_artifact: "^gov:artifact:[A-Z0-9_.-]+$"
+  gov_role: "^gov:role:[A-Za-z0-9_-]+$"
+  cobit: "^ceg:COBITProcess:(APO\d{2}|BAI\d{2}|DSS\d{2})$"
+  itil: "^ceg:ITILPractice:[A-Za-z][A-Za-z0-9]+$"
+  iso: "^ceg:ISOControl:A\.\d{1,2}$"
+  deliverable: "^bks:deliverable:(BRD|RTM|RVR|HLD|ADD|SC|ITSM-PORT)$"
+  template: "^bks:template:T-(BRD|RTM|RVR|HLD|ADD|GSA|RCL|SC|ITSM-PORT)$"
+  lifecycle: "^bks:lifecycle:(Bid|Transition|Run)$"
+  phase: "^bks:phase:(BRD|RTM|RVR|HLD|ADD|SC|ITSM-PORT)$"
+  status: "^bks:status:(Draft|InReview|Approved|Superseded)$"
+  audience: "^bks:audience:(Architecture|SDM|ARB|Security|Delivery|Business)$"
