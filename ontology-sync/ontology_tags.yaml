@@ -42,19 +42,38 @@ namespaces:
   bks: "bookstack:/"
   gov: "https://vocab.ceg/governance/"
 tag_patterns:
-  requirement_id: "^id:req:(BR-\d{3}|FR-\d{3}|NFR-\d{3})$"
-  class_tag: "^ceg:(BusinessLine|ProductFamily|Product|Document|Process|Requirement|BusinessRequirement|FunctionalRequirement|NonFunctionalRequirement|HChapter|Policy|Artifact|Role|COBITProcess|ITILPractice|ISOControl):[A-Za-z0-9._-]+$"
-  gov_chapter: "^gov:chapter:H(10|[1-9])$"
-  gov_process: "^gov:process:[A-Z0-9_-]+$"
-  gov_policy: "^gov:policy:[A-Z0-9_.-]+$"
-  gov_artifact: "^gov:artifact:[A-Z0-9_.-]+$"
-  gov_role: "^gov:role:[A-Za-z0-9_-]+$"
-  cobit: "^ceg:COBITProcess:(APO\d{2}|BAI\d{2}|DSS\d{2})$"
-  itil: "^ceg:ITILPractice:[A-Za-z][A-Za-z0-9]+$"
-  iso: "^ceg:ISOControl:A\.\d{1,2}$"
-  deliverable: "^bks:deliverable:(BRD|RTM|RVR|HLD|ADD|SC|ITSM-PORT)$"
-  template: "^bks:template:T-(BRD|RTM|RVR|HLD|ADD|GSA|RCL|SC|ITSM-PORT)$"
-  lifecycle: "^bks:lifecycle:(Bid|Transition|Run)$"
-  phase: "^bks:phase:(BRD|RTM|RVR|HLD|ADD|SC|ITSM-PORT)$"
-  status: "^bks:status:(Draft|InReview|Approved|Superseded)$"
-  audience: "^bks:audience:(Architecture|SDM|ARB|Security|Delivery|Business)$"
+  # Requirement identifiers (H8 id_patterns)
+  requirement_id: '^id:req:(BR-\d{3}|FR-\d{3}|NFR-\d{3})$'
+
+  # Classes
+  class_tag: '^ceg:(BusinessLine|ProductFamily|Product|Document|Process|Requirement|BusinessRequirement|FunctionalRequirement|NonFunctionalRequirement|HChapter|Policy|Artifact|Role|COBITProcess|ITILPractice|ISOControl):[A-Za-z0-9._-]+$'
+
+  # Governance chapters (H1–H10)
+  gov_chapter: '^gov:chapter:H(10|[1-9])$'
+
+  # Processes (H4)
+  gov_process: '^gov:process:[A-Z0-9_-]+$'
+
+  # Policies (H7)
+  gov_policy: '^gov:policy:[A-Z0-9_.-]+$'
+
+  # Artefacts (H8)
+  gov_artifact: '^gov:artifact:[A-Z0-9_.-]+$'
+
+  # Roles (H3)
+  gov_role: '^gov:role:[A-Za-z0-9_-]+$'
+
+  # Frameworks
+  cobit: '^ceg:COBITProcess:(APO\d{2}|BAI\d{2}|DSS\d{2})$'
+  itil: '^ceg:ITILPractice:[A-Za-z][A-Za-z0-9]+$'
+  iso: '^ceg:ISOControl:A\.\d{1,2}$'
+
+  # Deliverables / Templates (H8)
+  deliverable: '^bks:deliverable:(BRD|RTM|RVR|HLD|ADD|SC|ITSM-PORT)$'
+  template: '^bks:template:T-(BRD|RTM|RVR|HLD|ADD|GSA|RCL|SC|ITSM-PORT)$'
+
+  # Context
+  lifecycle: '^bks:lifecycle:(Bid|Transition|Run)$'
+  phase: '^bks:phase:(BRD|RTM|RVR|HLD|ADD|SC|ITSM-PORT)$'
+  status: '^bks:status:(Draft|InReview|Approved|Superseded)$'
+  audience: '^bks:audience:(Architecture|SDM|ARB|Security|Delivery|Business)$'
